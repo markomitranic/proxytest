@@ -18,8 +18,10 @@ Install and then run vegeta against the deployment:
 ```bash
 brew update && brew install vegeta
 
-# Run 50reqps for 30 seconds...
-echo "GET http://proxytest.com" | vegeta attack -insecure -rate=50 -duration=30s | tee results.bin && \
+# Warm up the server...
+curl http://proxytest.com
+# Run 10reqps for 60 seconds...
+echo "GET http://proxytest.com" | vegeta attack -insecure -rate=10 -duration=60s | tee results.bin && \
 echo "" && echo "" &&  \
 cat results.bin | vegeta report -type=text
 ```
@@ -28,43 +30,55 @@ Take a look at the latencies of the printed result report.
 
 First, raw vercel:
 ```none
-Requests      [total, rate, throughput]         1500, 50.03, 49.97
-Duration      [total, attack, wait]             30.016s, 29.979s, 36.798ms
-Latencies     [min, mean, 50, 90, 95, 99, max]  32.319ms, 48.92ms, 39.661ms, 51.771ms, 64.88ms, 310.978ms, 710.852ms
-Bytes In      [total, mean]                     63000, 42.00
+Requests      [total, rate, throughput]         600, 10.02, 10.01
+Duration      [total, attack, wait]             59.934s, 59.9s, 34.339ms
+Latencies     [min, mean, 50, 90, 95, 99, max]  31.935ms, 46.285ms, 37.243ms, 46.505ms, 60.307ms, 327.528ms, 786.985ms
+Bytes In      [total, mean]                     25200, 42.00
 Bytes Out     [total, mean]                     0, 0.00
 Success       [ratio]                           100.00%
-Status Codes  [code:count]                      200:1500  
+Status Codes  [code:count]                      200:600  
 Error Set:
 ```
 
 Now, with reverse proxy:
 ```none
-Requests      [total, rate, throughput]         1500, 50.03, 49.96
-Duration      [total, attack, wait]             30.025s, 29.98s, 44.895ms
-Latencies     [min, mean, 50, 90, 95, 99, max]  40.915ms, 49.942ms, 45.625ms, 52.821ms, 59.633ms, 139.868ms, 444.995ms
-Bytes In      [total, mean]                     63000, 42.00
+Requests      [total, rate, throughput]         600, 10.02, 10.00
+Duration      [total, attack, wait]             59.971s, 59.9s, 70.521ms
+Latencies     [min, mean, 50, 90, 95, 99, max]  58.731ms, 71.77ms, 66.885ms, 77.817ms, 84.8ms, 143.091ms, 727.626ms
+Bytes In      [total, mean]                     25200, 42.00
 Bytes Out     [total, mean]                     0, 0.00
 Success       [ratio]                           100.00%
-Status Codes  [code:count]                      200:1500  
+Status Codes  [code:count]                      200:600  
 Error Set:
 ```
 
 ## Results: 
 
-🏁 That makes it:
+🏁 When ran against Vercel's edge or middleware, which runs on Cloudflare's edge network:
 
 | #    | Vercel  | Redirection | Difference |
 | ---- | ------- | ----------- | ---------- |
-| min  | 32.319  | 40.915      | +8.596     |
-| mean | 48.92   | 49.942      | +1.022     |
-| 50   | 39.661  | 45.625      | +5.964     |
-| 90   | 51.771  | 52.821      | +1.050     |
-| 95   | 64.88   | 59.633      | -5.247     |
-| 99   | 310.978 | 139.868     | -171.110   |
-| max  | 710.852 | 444.995     | -265.857   |
+| min  | 32.319  | 43.57       | 🔺 +8.596   |
+| mean | 48.92   | 56.373      | 🔺 +1.022   |
+| 50   | 39.661  | 48.506      | 🔺 +5.964   |
+| 90   | 51.771  | 57.556      | 🔺 +1.050   |
+| 95   | 64.88   | 70.424      | 🩲 -5.247   |
+| 99   | 310.978 | 342.633     | 🩲 -171.110 |
+| max  | 710.852 | 578.766     | 🩲 -265.857 |
 
-We can safely ignore anything above the 95 percentile mark, as uncertainty rises, as we often hit Vercel's DDoS firewall or cold start times for parallel middleware functions.
+🏁 When ran against Vercel's nodejs runtime which runs on Frankfurt 1:
+
+| #    | Vercel  | Redirect | Diff       |
+| ---- | ------- | -------- | ---------- |
+| min  | 31.935  | 58.731   | 🔺 +26.80ms |
+| mean | 46.285  | 71.77    | 🔺 +25.48ms |
+| 50   | 37.243  | 66.885   | 🔺 +29.64ms |
+| 90   | 46.505  | 77.817   | 🔺 +31.31ms |
+| 95   | 60.307  | 84.8     | 🔺 +24.49ms |
+| 99   | 327.528 | 143.091  | 🩲-184.44ms |
+| max  | 786.985 | 727.626  | 🩲-59.36ms  |
+
+**⚠️ We can safely ignore anything above the 95 percentile mark, as unreliability rises, as we often hit Vercel's unpredictable DDoS firewall or cold start times for parallel middleware functions.**
 
 ---
 
