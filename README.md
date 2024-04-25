@@ -10,21 +10,35 @@ Install and then run vegeta against the deployment:
 ```bash
 brew update && brew install vegeta
 
-# Run 50reqps for 10 seconds...
-echo "GET https://proxytest.com" | vegeta attack -rate=50 -duration=10s | tee results.bin && \
+# Run 50reqps for 30 seconds...
+echo "GET http://proxytest.com" | vegeta attack -insecure -rate=50 -duration=30s | tee results.bin && \
 echo "" && echo "" &&  \
 cat results.bin | vegeta report -type=text
 ```
 
 Take a look at the latencies of the printed result report.
+
+First, raw vercel:
 ```none
-Requests      [total, rate, throughput]         1500, 50.03, 0.00
-Duration      [total, attack, wait]             30.023s, 29.98s, 43.595ms
-Latencies     [min, mean, 50, 90, 95, 99, max]  33.959ms, 47.716ms, 42.148ms, 52.888ms, 61.597ms, 168.143ms, 1.048s
-Bytes In      [total, mean]                     0, 0.00
+Requests      [total, rate, throughput]         1500, 50.03, 49.96
+Duration      [total, attack, wait]             30.026s, 29.98s, 45.695ms
+Latencies     [min, mean, 50, 90, 95, 99, max]  31.304ms, 45.522ms, 39.756ms, 53.027ms, 66.278ms, 186.097ms, 464.97ms
+Bytes In      [total, mean]                     63000, 42.00
 Bytes Out     [total, mean]                     0, 0.00
-Success       [ratio]                           0.00%
-Status Codes  [code:count]                      0:1500  
+Success       [ratio]                           100.00%
+Status Codes  [code:count]                      200:1500  
+Error Set:
+```
+
+Now, with reverse proxy:
+```none
+Requests      [total, rate, throughput]         1500, 50.03, 49.96
+Duration      [total, attack, wait]             30.026s, 29.98s, 46.449ms
+Latencies     [min, mean, 50, 90, 95, 99, max]  40.652ms, 51.985ms, 48.013ms, 55.342ms, 65.08ms, 130.084ms, 550.76ms
+Bytes In      [total, mean]                     63000, 42.00
+Bytes Out     [total, mean]                     0, 0.00
+Success       [ratio]                           100.00%
+Status Codes  [code:count]                      200:1500  
 Error Set:
 ```
 
