@@ -56,27 +56,27 @@ Error Set:
 
 🏁 When ran against Vercel's edge or middleware, which runs on Cloudflare's edge network:
 
-| #    | Vercel  | Redirection | Difference |
-| ---- | ------- | ----------- | ---------- |
-| min  | 32.319  | 43.57       | 🔺 +8.596   |
-| mean | 48.92   | 56.373      | 🔺 +1.022   |
-| 50   | 39.661  | 48.506      | 🔺 +5.964   |
-| 90   | 51.771  | 57.556      | 🔺 +1.050   |
-| 95   | 64.88   | 70.424      | 🩲 -5.247   |
-| 99   | 310.978 | 342.633     | 🩲 -171.110 |
-| max  | 710.852 | 578.766     | 🩲 -265.857 |
+| #    | Vercel  | Redirection | Difference    |
+| ---- | ------- | ----------- | ------------- |
+| min  | 32.319  | 43.57       | 🔺 +8.596 ms   |
+| mean | 48.92   | 56.373      | 🔺 +1.022 ms   |
+| 50   | 39.661  | 48.506      | 🔺 +5.964 ms   |
+| 90   | 51.771  | 57.556      | 🔺 +1.050 ms   |
+| 95   | 64.88   | 70.424      | 🩲 -5.247 ms   |
+| 99   | 310.978 | 342.633     | 🩲 -171.110 ms |
+| max  | 710.852 | 578.766     | 🩲 -265.857 ms |
 
 🏁 When ran against Vercel's nodejs runtime which runs on Frankfurt 1:
 
-| #    | Vercel  | Redirect | Diff       |
-| ---- | ------- | -------- | ---------- |
-| min  | 31.935  | 58.731   | 🔺 +26.80ms |
-| mean | 46.285  | 71.77    | 🔺 +25.48ms |
-| 50   | 37.243  | 66.885   | 🔺 +29.64ms |
-| 90   | 46.505  | 77.817   | 🔺 +31.31ms |
-| 95   | 60.307  | 84.8     | 🔺 +24.49ms |
-| 99   | 327.528 | 143.091  | 🩲-184.44ms |
-| max  | 786.985 | 727.626  | 🩲-59.36ms  |
+| #    | Vercel  | Redirect | Diff        |
+| ---- | ------- | -------- | ----------- |
+| min  | 31.935  | 58.731   | 🔺 +26.80 ms |
+| mean | 46.285  | 71.77    | 🔺 +25.48 ms |
+| 50   | 37.243  | 66.885   | 🔺 +29.64 ms |
+| 90   | 46.505  | 77.817   | 🔺 +31.31 ms |
+| 95   | 60.307  | 84.8     | 🔺 +24.49 ms |
+| 99   | 327.528 | 143.091  | 🩲-184.44 ms |
+| max  | 786.985 | 727.626  | 🩲-59.36 ms  |
 
 **⚠️ We can safely ignore anything above the 95 percentile mark, as unreliability rises, as we often hit Vercel's unpredictable DDoS firewall or cold start times for parallel middleware functions.**
 
