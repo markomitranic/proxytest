@@ -16,6 +16,7 @@ echo "" && echo "" &&  \
 cat results.bin | vegeta report -type=text
 ```
 
+## Results: 
 Take a look at the latencies of the printed result report.
 
 First, raw vercel:
