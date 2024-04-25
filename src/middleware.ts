@@ -11,7 +11,5 @@ export const config = {
 };
 
 export function middleware() {
-      return Response.json(
-        { success: true, timestamp: Date.now() },
-      )
+  return Response.json({ success: true, timestamp: Date.now() })
   }
